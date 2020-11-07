@@ -2,6 +2,9 @@
 
 public class Rocket : MonoBehaviour
 {
+    [SerializeField] float rcsThrust = 250f;
+    [SerializeField] float mainThrust = 50f;
+
     Rigidbody rigidbody;
     AudioSource audioSource;
 
@@ -9,22 +12,37 @@ public class Rocket : MonoBehaviour
     void Start()
     {
         rigidbody = GetComponent<Rigidbody>();
-        rigidbody.mass = 0.1f;
-
         audioSource = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        ProcessInput();
+        Thrust();
+        Rotate();
     }
 
-    private void ProcessInput()
+    private void OnCollisionEnter(Collision collision)
+    {
+        switch (collision.gameObject.tag)
+        {
+            case "Friendly":
+                print("OK");
+                break;
+            case "Fuel":
+                print("Fuel");
+                break;
+            default:
+                print("Lose");
+                break;
+        }
+    }
+
+    private void Thrust()
     {
         if (Input.GetKey(KeyCode.Space))
         {
-            rigidbody.AddRelativeForce(Vector3.up);
+            rigidbody.AddRelativeForce(Vector3.up * mainThrust);
             if (!audioSource.isPlaying)
             {
                 audioSource.Play();
@@ -34,14 +52,22 @@ public class Rocket : MonoBehaviour
         {
             audioSource.Stop();
         }
+    }
+
+    private void Rotate()
+    {
+        rigidbody.freezeRotation = true; //We control the physics when rotating
+        float rotationThisFrame = rcsThrust * Time.deltaTime;
 
         if (Input.GetKey(KeyCode.A))
         {
-            transform.Rotate(Vector3.forward, Space.Self);
+            transform.Rotate(Vector3.forward * rotationThisFrame, Space.Self);
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            transform.Rotate(-Vector3.forward, Space.Self);
+            transform.Rotate(-Vector3.forward * rotationThisFrame, Space.Self);
         }
+
+        rigidbody.freezeRotation = false; //Restore the physics to default
     }
 }
