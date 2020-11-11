@@ -3,7 +3,7 @@
 public class Rocket : MonoBehaviour
 {
     [SerializeField] float rcsThrust = 250f;
-    [SerializeField] float mainThrust = 50f;
+    [SerializeField] float mainThrust = 30f;
 
     Rigidbody rigidbody;
     AudioSource audioSource;
